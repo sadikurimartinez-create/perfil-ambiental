@@ -419,19 +419,149 @@ export default function HomePage() {
           </div>
         </form>
 
-        {/* Resultado mínimo (placeholder) */}
+               {/* Perfil Ambiental generado (resumen visual) */}
         {analysisResult && (
-          <section className="mt-2 bg-slate-950/70 border border-slate-800 rounded-xl p-3 space-y-1">
-            <p className="text-xs font-semibold text-slate-200">
-              Perfil Ambiental generado
-            </p>
-            <p className="text-[11px] text-slate-400">
-              Los detalles completos del análisis se encuentran listos para ser
-              mostrados en el dashboard criminológico.
-            </p>
+          <section className="mt-4 bg-slate-950/70 border border-slate-800 rounded-xl p-4 space-y-4">
+            <h2 className="text-sm font-semibold text-slate-100">
+              Resumen del Perfil Criminológico Ambiental
+            </h2>
+
+            {(() => {
+              const profile = analysisResult as any;
+              const vision = profile?.deterioroFisico?.vision;
+              const indicadores = vision?.indicadoresVentanasRotas;
+              const irregulares =
+                profile?.comerciosIrregulares?.posiblesIrregulares ?? [];
+              const conflictos =
+                profile?.atractoresDelito?.puntosConflictoEscuelaAlcohol ??
+                [];
+
+              return (
+                <div className="space-y-3 text-xs">
+                  {/* Ventanas Rotas */}
+                  <div className="space-y-1">
+                    <p className="font-semibold text-slate-200">
+                      Deterioro Físico (Ventanas Rotas)
+                    </p>
+                    {!indicadores ? (
+                      <p className="text-slate-400">
+                        No se detectaron indicadores claros de deterioro físico
+                        en este punto.
+                      </p>
+                    ) : (
+                      <ul className="list-disc list-inside space-y-1 text-slate-300">
+                        {indicadores.basuraOEscombro && (
+                          <li>Basura, escombro o residuos en el entorno.</li>
+                        )}
+                        {indicadores.malezaOCrecimientoExcesivo && (
+                          <li>Maleza o vegetación crecida sin mantenimiento.</li>
+                        )}
+                        {indicadores.inmueblesAbandonados && (
+                          <li>Probables inmuebles abandonados o en ruinas.</li>
+                        )}
+                        {indicadores.posiblesGrafitisOMarcaje && (
+                          <li>Grafitis / marcaje territorial visibles.</li>
+                        )}
+                        {indicadores.bajaIluminacionONoche && (
+                          <li>Condiciones de baja iluminación u oscuridad.</li>
+                        )}
+                        {indicadores.vehiculosAbandonados && (
+                          <li>Vehículos abandonados o chatarra en el área.</li>
+                        )}
+                        {indicadores.estructurasImprovisadas && (
+                          <li>Estructuras improvisadas (lonas, chozas, etc.).</li>
+                        )}
+                      </ul>
+                    )}
+                  </div>
+
+                  {/* Comercios irregulares */}
+                  <div className="space-y-1">
+                    <p className="font-semibold text-slate-200">
+                      Comercios Irregulares (Places vs DENUE)
+                    </p>
+                    {irregulares.length === 0 ? (
+                      <p className="text-slate-400">
+                        No se identificaron comercios irregulares en el radio
+                        analizado.
+                      </p>
+                    ) : (
+                      <ul className="space-y-2">
+                        {irregulares.map((c: any, idx: number) => (
+                          <li
+                            key={idx}
+                            className="border border-amber-700/70 bg-amber-950/30 rounded-lg px-3 py-2"
+                          >
+                            <p className="font-semibold text-amber-300">
+                              {c.lugarGoogle?.nombre}
+                            </p>
+                            <p className="text-[11px] text-slate-300">
+                              {c.lugarGoogle?.direccion}
+                            </p>
+                            <p className="text-[11px] text-amber-200 mt-1">
+                              {c.motivo}
+                            </p>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+
+                  {/* Atractores de delito */}
+                  <div className="space-y-1">
+                    <p className="font-semibold text-slate-200">
+                      Atractores de Delito (Escuelas vs Expendios de Alcohol)
+                    </p>
+                    <p className="text-[11px] text-slate-400">
+                      {profile?.atractoresDelito?.resumen ??
+                        "No se detectaron conflictos escuela–alcohol en el radio analizado."}
+                    </p>
+                    {conflictos.length > 0 && (
+                      <ul className="space-y-2 mt-1">
+                        {conflictos.map((c: any, idx: number) => (
+                          <li
+                            key={idx}
+                            className="border border-red-700/70 bg-red-950/30 rounded-lg px-3 py-2"
+                          >
+                            <p className="text-slate-100">
+                              <span className="font-semibold text-red-300">
+                                Escuela:
+                              </span>{" "}
+                              {c.escuela?.nombre}
+                            </p>
+                            <p className="text-[11px] text-slate-300">
+                              {c.escuela?.direccion}
+                            </p>
+                            <p className="text-slate-100 mt-1">
+                              <span className="font-semibold text-red-300">
+                                Expendio de alcohol:
+                              </span>{" "}
+                              {c.expendioAlcohol?.nombre}
+                            </p>
+                            <p className="text-[11px] text-slate-300">
+                              {c.expendioAlcohol?.direccion}
+                            </p>
+                            <p className="mt-1 text-[11px] text-red-200">
+                              Distancia aproximada: {c.distanciaMetros} m
+                            </p>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+
+                  {/* Elección racional / rutas */}
+                  <div className="space-y-1">
+                    <p className="font-semibold text-slate-200">
+                      Análisis de Rutas (Elección Racional)
+                    </p>
+                    <p className="text-[11px] text-slate-300">
+                      {profile?.analisisRutas?.resumen ??
+                        "No se dispone de información detallada de rutas de escape para este punto."}
+                    </p>
+                  </div>
+                </div>
+              );
+            })()}
           </section>
         )}
-      </div>
-    </div>
-  );
-}
