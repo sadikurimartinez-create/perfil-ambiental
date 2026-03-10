@@ -1,21 +1,48 @@
-import { ImageUpload } from "@/components/ImageUpload";
+"use client";
 
-export default function HomePage() {
-  return (
-    <div className="space-y-6">
-      <header className="space-y-2">
-        <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
-          Perfil Criminológico Ambiental
-        </h1>
-        <p className="text-sm text-slate-400 max-w-2xl">
-          Etapa 1 · Captura y georreferenciación de evidencia fotográfica
-          para iniciar el análisis bajo los marcos de Actividades Rutinarias,
-          Patrón Delictivo, Elección Racional y Ventanas Rotas.
-        </p>
-      </header>
+import { useState, useMemo } from "react";
+import exifr from "exifr";
 
-      <ImageUpload />
-    </div>
-  );
-}
+type GpsData = {
+  latitude: number;
+  longitude: number;
+};
 
+type AnalyzeEnvironmentResponse = any; // puedes afinarlo luego
+
+const CATEGORIES = [
+  "Escuela",
+  "Núcleo Habitacional",
+  "Oxxo",
+  "Terreno Baldío",
+  "Terminal de Transporte Público",
+  "Parque Recreativo",
+  "Ruta",
+  "Taller",
+  "Comercio no registrado",
+  "Banco",
+  "Casa de empeño",
+  "Restaurante de comida rápida",
+  "Comida callejera",
+  "Cantina",
+  "Expendio de vino",
+  "Otro",
+] as const;
+
+type Category = (typeof CATEGORIES)[number];
+
+const CATEGORIES_REQUIRING_DETAIL: Category[] = [
+  "Ruta",
+  "Comercio no registrado",
+  "Comida callejera",
+  "Otro",
+];
+
+// Redimensiona la imagen en el navegador a un máximo de 1024px de ancho/alto
+async function resizeImageToBase64(
+  file: File,
+  maxSize = 1024
+): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const reader
