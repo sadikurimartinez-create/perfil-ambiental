@@ -379,10 +379,12 @@ export async function POST(req: Request) {
           const res = await analyzeBrokenWindowsWithVision({
             imageBase64: p.imageBase64,
           });
+          const etiquetas = res?.etiquetasRelevantes ?? [];
+          const texto = res?.textoDetectado ?? [];
           return {
             photoId: p.id,
-            etiquetas: res.etiquetasRelevantes ?? [],
-            texto: res.textoDetectado ?? [],
+            etiquetas,
+            texto,
           };
         } catch (e) {
           console.error(
