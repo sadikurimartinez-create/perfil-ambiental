@@ -150,7 +150,7 @@ export async function POST(req: Request) {
       weight: 1
     }));
 
-    const historicalCrimes = delitosCercanos.map((row) => ({
+    const historicalCrimes = delitosCercanos.map((row: any) => ({
       lat: Number(row.lat),
       lng: Number(row.lng),
       tipoDelito: row.incidente as string,
